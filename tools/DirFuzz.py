@@ -1,5 +1,4 @@
 from concurrent.futures import ThreadPoolExecutor
-import threading
 import requests
 
 class DirFuzz(object):
