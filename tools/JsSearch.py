@@ -1,5 +1,6 @@
 import requests
-import bs4
+# import bs4
+from load import *
 
 class JsSearch(object):
 
@@ -11,10 +12,21 @@ class JsSearch(object):
         }
         self.timeout = 1
         self.target = 'http://www.baidu.com/'
+        self.content = ''
 
     def GetHtml(self):
-
-    def SearchInHtml(self):
-
-    def SearchInJs(self):
+        try:
+            req = requests.get(url=self.target,
+                               headers=self.headers,
+                               proxies=self.proxies,
+                               timeout=self.timeout)
+            content = req.text
+            self.content = content
+        except Exception as e:
+            print(e)
+            return 'Error', 'Error'
+    #
+    # def SearchInHtml(self):
+    #
+    # def SearchInJs(self):
 

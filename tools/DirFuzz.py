@@ -1,33 +1,18 @@
 from concurrent.futures import ThreadPoolExecutor
-import requests
+from  module import *
+import tqdm
+import os
 
-class DirFuzz(object):
+class DirFuzz(HttpConfig,FileIO):
 
     def __init__(self):
-        self.headers = {}
-        self.proxies = {
-            'http:':None,
-            'https:':None,
-        }
-        self.timeout = 1
-        self.target = 'http://www.baidu.com/'
-        self.dictionary = ['aaa','aaa','aaa','aaa','aaa']
+        super().__init__()
+        self.dictionary = self.FileReadInList('../test.txt')
+        print(self.dictionary)
         self.max_workers = 5
 
         self.target_length_list = []
         self.target_status_list = []
-
-    def __SelectHeaders(self,headers):
-        self.headers = headers
-
-    def __SelectProxies(self,proxies):
-        self.proxies = proxies
-
-    def __SelectTimeout(self,timeout):
-        self.timeout = timeout
-
-    def __SelectTarget(self,target):
-        self.target = target
 
     def __SelectDictionary(self,dictionary):
         self.dictionary = dictionary
@@ -37,7 +22,9 @@ class DirFuzz(object):
 
     def GetTargetStatusAndLength(self,param):
         try:
-            req = requests.get(url =self.target + param,
+            s = requests.session()
+            s.keep_alive = False
+            req = s.get(url =self.target + param,
                                headers = self.headers,
                                proxies = self.proxies,
                                timeout = self.timeout)
@@ -57,10 +44,11 @@ class DirFuzz(object):
 
     def test(self):
         with ThreadPoolExecutor(max_workers = self.max_workers) as executor:
-            result = list(executor.map(self.GetTargetStatusAndLength,self.dictionary))
+            result = list(tqdm(executor.map(self.GetTargetStatusAndLength,self.dictionary),total = len(self.dictionary)))
         for element in result:
             print(element)
 
 if __name__ == '__main__':
     test = DirFuzz()
+    print(test.target)
     test.test()

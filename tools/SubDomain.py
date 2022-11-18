@@ -2,16 +2,15 @@ from concurrent.futures import ThreadPoolExecutor
 import requests
 from publicsuffix2 import get_public_suffix
 
-class SubDomain(object):
+class SubDomain():
 
     def __init__(self):
-        self.headers = {}
-        self.proxies = {
-            'http:': None,
-            'https:': None,
-        }
-        self.timeout = 1
-        self.target = 'http://www.baidu.com/'
+        super().__init__()
+        self.dictionary = ['aaa', 'aaa', 'aaa', 'aaa', 'aaa']
+        self.max_workers = 5
+
+        self.target_length_list = []
+        self.target_status_list = []
 
     def __SelectHeaders(self, headers):
         self.headers = headers
@@ -33,7 +32,7 @@ class SubDomain(object):
     def __SelectMaxWorkers(self, max_workers):
         self.max_workers = max_workers
 
-    def FuzzSubDomain(self, param,):
+    def FuzzSubDomain(self, param):
         try:
             req = requests.get(url=,
                                headers=self.headers,
