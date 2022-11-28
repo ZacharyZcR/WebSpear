@@ -1,30 +1,19 @@
 from concurrent.futures import ThreadPoolExecutor
-import requests
+from module import *
+from tqdm import tqdm
 from publicsuffix2 import get_public_suffix
 
-class SubDomain():
+class SubDomain(HttpConfig,FileIO):
 
     def __init__(self):
         super().__init__()
-        self.dictionary = ['aaa', 'aaa', 'aaa', 'aaa', 'aaa']
-        self.max_workers = 5
+        self.dictionary = self.FileReadInList('../config/top7000.txt')
+        self.max_workers = 10
 
         self.target_length_list = []
         self.target_status_list = []
-
-    def __SelectHeaders(self, headers):
-        self.headers = headers
-
-    def __SelectProxies(self, proxies):
-        self.proxies = proxies
-
-    def __SelectTimeout(self, timeout):
-        self.timeout = timeout
-
-    def __SelectTarget(self, target):
-        target = get_public_suffix(target)
-        print(target)
-        self.target = target
+        self.target_list = []
+        self.target_length_dec_list = []
 
     def __SelectDictionary(self, dictionary):
         self.dictionary = dictionary
@@ -34,7 +23,9 @@ class SubDomain():
 
     def FuzzSubDomain(self, param):
         try:
-            req = requests.get(url=,
+            s = requests.session()
+            s.keep_alive = False
+            req = s.get(url=,
                                headers=self.headers,
                                proxies=self.proxies,
                                timeout=self.timeout)

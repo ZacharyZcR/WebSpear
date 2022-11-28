@@ -11,7 +11,18 @@ class FileIO(object):
             return templist
         except Exception as e:
             print(e)
-            return "Error"
+
+    def FileWriteInTxt(self,list,file):
+        try:
+            templist = list
+            with open(file,'w') as f:
+                for element in templist:
+                    f.write(element+'\n')
+        except Exception as e:
+            print(e)
+
+
+
 
 if __name__ == "__main__":
     test = FileIO()
