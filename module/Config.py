@@ -2,7 +2,7 @@ import requests
 import configparser
 import json
 
-class HttpConfig(object):
+class Config(object):
 
     def __init__(self):
         config = configparser.ConfigParser()

@@ -2,17 +2,23 @@ from concurrent.futures import ThreadPoolExecutor
 from module import *
 from tqdm import tqdm
 
-class DirFuzz(HttpConfig,FileIO):
+class DirFuzz(Config, FileIO):
 
     def __init__(self):
         super().__init__()
         self.dictionary = self.FileReadInList('../config/top7000.txt')
         self.max_workers = 10
 
+        self.target = self.HandleUrl(self.target)
+        self.http_flag = None
+        self.https_flag = None
+
         self.target_length_list = []
         self.target_status_list = []
         self.target_list = []
         self.target_length_dec_list = []
+        self.result = []
+
 
     def __SelectDictionary(self,dictionary):
         self.dictionary = dictionary
@@ -20,11 +26,39 @@ class DirFuzz(HttpConfig,FileIO):
     def __SelectMaxWorkers(self,max_workers):
         self.max_workers = max_workers
 
+    # def IpOrDomain(self,target):
+    #     try:
+    #
+
+    def HttpOrHttps(self):
+        http_flag = True
+        https_flag = True
+        try:
+            req = requests.get(url = 'http://' + self.target,
+                               headers=self.headers,
+                               proxies=self.proxies,
+                               timeout=self.timeout)
+            if req.status_code != 200:
+                http_flag = False
+        except:
+            http_flag = False
+        try:
+            req = requests.get(url = 'https://' + self.target,
+                               headers=self.headers,
+                               proxies=self.proxies,
+                               timeout=self.timeout)
+            if req.status_code != 200:
+                https_flag = False
+        except:
+            https_flag = False
+        self.http_flag = http_flag
+        self.https_flag = https_flag
+
     def GetTargetStatusAndLength(self,param):
         try:
             s = requests.session()
             s.keep_alive = False
-            req = s.get(url =self.target + param,
+            req = s.get(url = self.target + param,
                                headers = self.headers,
                                proxies = self.proxies,
                                timeout = self.timeout)
@@ -34,7 +68,7 @@ class DirFuzz(HttpConfig,FileIO):
         except Exception as e:
             pass
 
-    def Scan(self):
+    def DirScan(self):
         with ThreadPoolExecutor(max_workers = self.max_workers) as executor:
             result = list(tqdm(executor.map(self.GetTargetStatusAndLength,self.dictionary),total = len(self.dictionary)))
         for element in result:
@@ -45,7 +79,7 @@ class DirFuzz(HttpConfig,FileIO):
             except:
                 pass
 
-    def Handle(self):
+    def DirHandle(self):
         try:
             dec_list = []
             average = int(sum(self.target_length_list) / len(self.target_length_list))
@@ -64,10 +98,21 @@ class DirFuzz(HttpConfig,FileIO):
         except Exception as e:
             print(e)
 
-    def Report(self):
+    def DirResult(self):
+        for i in range(len(self.target_list)):
+            self.result.append(f"{self.target_list[i]} - {self.target_status_list[i]} - {self.target_length_dec_list[i]}")
+
+    def DirReport(self):
         try:
-            for i in range(len(self.target_list)):
-                print(f"{self.target_list[i]} - {self.target_status_list[i]} - {self.target_length_dec_list[i]}")
+            for element in self.result:
+                print(element)
+        except Exception as e:
+            print(e)
+            pass
+
+    def DirStore(self,filename):
+        try:
+            self.FileWriteInTxt(self.result, filename)
         except Exception as e:
             pass
 
@@ -79,6 +124,8 @@ class DirFuzz(HttpConfig,FileIO):
 
 if __name__ == '__main__':
     test = DirFuzz()
-    test.Scan()
-    test.Handle()
-    test.Report()
+    test.DirScan()
+    test.DirHandle()
+    test.DirResult()
+    test.DirStore('test1.txt')
+    test.DirReport()

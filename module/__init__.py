@@ -1,2 +1,3 @@
 from .FileIO import *
-from .HttpConfig import *
+from .Config import *
+from .UrlHandle import *
