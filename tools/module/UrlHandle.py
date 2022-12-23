@@ -1,10 +1,11 @@
 from publicsuffix2 import *
+import re
 
 class UrlHandle(object):
 
-    def HttpOrHttpsHandle(self,url):
-        url = url.replace('http://','')
-        url = url.replace('https://', '')
+    def HttpOrHttpsHandle(self, url):
+        # 使用正则表达式替换URL中的协议类型
+        url = re.sub(r'^https?://', '', url)
         return url
 
     def DomainHandle(self,url):

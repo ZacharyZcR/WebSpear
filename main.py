@@ -1,6 +1,11 @@
-import os
+from tools import *
 
-dir = os.listdir('./tools')
-print(dir)
-for model in dir:
-    eval()
+class Main():
+
+    def __init__(self):
+        self.config = Config()
+        self.urlhandle = UrlHandle()
+        self.dirfuzz = DirFuzz()
+
+    def test(self):
+        self.dirfuzz.test()

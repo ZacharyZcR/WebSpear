@@ -1,5 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor
-from module import *
+from tools.module import *
 from tqdm import tqdm
 
 class SubDomain(Config, FileIO):

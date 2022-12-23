@@ -1,6 +1,5 @@
 import requests
 # import bs4
-from load import *
 
 class JsSearch(object):
 

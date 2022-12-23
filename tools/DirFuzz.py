@@ -1,8 +1,8 @@
 from concurrent.futures import ThreadPoolExecutor
-from module import *
+from tools.module import *
 from tqdm import tqdm
 
-class DirFuzz(Config, FileIO):
+class DirFuzz(Config, FileIO, UrlHandle):
 
     def __init__(self):
         super().__init__()
@@ -12,6 +12,7 @@ class DirFuzz(Config, FileIO):
         self.target = self.HandleUrl(self.target)
         self.http_flag = None
         self.https_flag = None
+        self.protocol = None
 
         self.target_length_list = []
         self.target_status_list = []
@@ -19,46 +20,11 @@ class DirFuzz(Config, FileIO):
         self.target_length_dec_list = []
         self.result = []
 
-
-    def __SelectDictionary(self,dictionary):
-        self.dictionary = dictionary
-
-    def __SelectMaxWorkers(self,max_workers):
-        self.max_workers = max_workers
-
-    # def IpOrDomain(self,target):
-    #     try:
-    #
-
-    def HttpOrHttps(self):
-        http_flag = True
-        https_flag = True
-        try:
-            req = requests.get(url = 'http://' + self.target,
-                               headers=self.headers,
-                               proxies=self.proxies,
-                               timeout=self.timeout)
-            if req.status_code != 200:
-                http_flag = False
-        except:
-            http_flag = False
-        try:
-            req = requests.get(url = 'https://' + self.target,
-                               headers=self.headers,
-                               proxies=self.proxies,
-                               timeout=self.timeout)
-            if req.status_code != 200:
-                https_flag = False
-        except:
-            https_flag = False
-        self.http_flag = http_flag
-        self.https_flag = https_flag
-
     def GetTargetStatusAndLength(self,param):
         try:
             s = requests.session()
             s.keep_alive = False
-            req = s.get(url = self.target + param,
+            req = s.get(url = self.protocol + self.target + param,
                                headers = self.headers,
                                proxies = self.proxies,
                                timeout = self.timeout)
@@ -69,8 +35,18 @@ class DirFuzz(Config, FileIO):
             pass
 
     def DirScan(self):
-        with ThreadPoolExecutor(max_workers = self.max_workers) as executor:
-            result = list(tqdm(executor.map(self.GetTargetStatusAndLength,self.dictionary),total = len(self.dictionary)))
+        if self.http_flag == False and self.https_flag == False:
+            return 0
+
+        if self.http_flag:
+            self.protocol = 'http://'
+            with ThreadPoolExecutor(max_workers = self.max_workers) as executor:
+                result = list(tqdm(executor.map(self.GetTargetStatusAndLength,self.dictionary),total = len(self.dictionary)))
+        if self.https_flag:
+            self.protocol = 'https://'
+            with ThreadPoolExecutor(max_workers = self.max_workers) as executor:
+                result = list(tqdm(executor.map(self.GetTargetStatusAndLength,self.dictionary),total = len(self.dictionary)))
+
         for element in result:
             try:
                 self.target_length_list.append(element[0])
@@ -124,6 +100,7 @@ class DirFuzz(Config, FileIO):
 
 if __name__ == '__main__':
     test = DirFuzz()
+    test.HttpOrHttps()
     test.DirScan()
     test.DirHandle()
     test.DirResult()

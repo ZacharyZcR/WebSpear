@@ -22,7 +22,7 @@ if __name__ == "__main__":
     config["HttpConfig"]["proxies"] = '{"http:": "None","https:": "None"}'
     config["HttpConfig"]["timeout"] = '1'
     config["HttpConfig"]["target"] = 'http://www.baidu.com/'
-    config.write(open('../config/example.ini', 'w'))
+    config.write(open('../../config/example.ini', 'w'))
     # config.read('../config/example.ini')
     # config["DirFuzz"]
     # headers = json.loads(config["HttpConfig"]["headers"])
